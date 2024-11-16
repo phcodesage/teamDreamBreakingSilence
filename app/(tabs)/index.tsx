@@ -1,74 +1,147 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { StyleSheet, Image, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
+import { Link } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const LOGO_SIZE = 150;
+const BUTTON_WIDTH = LOGO_SIZE + 20;
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ImageBackground 
+      source={require('@/assets/images/background.png')} 
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+        {/* Header */}
+        <View style={styles.header}>
+          <ThemedText style={styles.title}>Breaking Silence</ThemedText>
+        </View>
+
+        {/* Logo Section */}
+        <View style={styles.logoContainer}>
+          <View style={styles.logoWrapper}>
+            <LinearGradient
+              colors={['#00CED1', '#FFFFFF']}
+              style={styles.logo}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            />
+            <Image 
+              source={require('@/assets/images/inner-logo.png')} 
+              style={styles.innerLogo}
+            />
+          </View>
+        </View>
+        
+        {/* Navigation Buttons */}
+        <View style={styles.buttonContainer}>
+          <Link href="/(tabs)/tutorial" asChild>
+            <TouchableOpacity style={styles.button}>
+              <ThemedText style={styles.buttonText}>TUTORIAL</ThemedText>
+            </TouchableOpacity>
+          </Link>
+          
+          <Link href="/(tabs)/translate" asChild>
+            <TouchableOpacity style={styles.button}>
+              <ThemedText style={styles.buttonText}>TRANSLATE</ThemedText>
+            </TouchableOpacity>
+          </Link>
+          
+          <Link href="/(tabs)/scan" asChild>
+            <TouchableOpacity style={styles.button}>
+              <ThemedText style={styles.buttonText}>SCAN</ThemedText>
+            </TouchableOpacity>
+          </Link>
+          
+          <Link href="/(tabs)/settings" asChild>
+            <TouchableOpacity style={styles.button}>
+              <ThemedText style={styles.buttonText}>SETTINGS</ThemedText>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  container: {
+    flex: 1,
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    backgroundColor: '#00CED1',
+    width: '100%',
+    borderBottomWidth: 3,
+    borderBottomColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingTop: 45,
+    paddingBottom: 15,
+    height: 50,
+    minHeight: 50,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  title: {
+    fontSize: 38,
+    fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
+    includeFontPadding: false,
+    lineHeight: 45,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+    marginBottom: 40,
+    width: BUTTON_WIDTH,
+  },
+  logoWrapper: {
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
+    borderRadius: LOGO_SIZE / 2,
+    borderWidth: 3,
+    borderColor: '#000',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  logo: {
+    width: '100%',
+    height: '100%',
     position: 'absolute',
+  },
+  innerLogo: {
+    position: 'absolute',
+    width: '80%',
+    height: '80%',
+    resizeMode: 'contain',
+    top: '10%',
+    left: '10%',
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    width: BUTTON_WIDTH,
+    gap: 25,
+  },
+  button: {
+    backgroundColor: 'rgba(0, 226, 230, 0.8)', // #00CED1 with 80% opacity
+    padding: 10,
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#000',
+    width: '100%',
+  },
+  buttonText: {
+    fontSize: 25,
+    fontWeight: '900',
+    color: '#000',
   },
 });
