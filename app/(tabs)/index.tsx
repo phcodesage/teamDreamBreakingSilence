@@ -18,7 +18,7 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText style={styles.title}>Breaking Silence</ThemedText>
+          <ThemedText style={styles.title}>BREAKING SILENCE </ThemedText>
         </View>
 
         {/* Logo Section */}
@@ -41,7 +41,7 @@ export default function HomeScreen() {
         <View style={styles.buttonContainer}>
           <Link href="/(tabs)/tutorial" asChild>
             <TouchableOpacity style={styles.button}>
-              <ThemedText style={styles.buttonText}>TUTORIAL</ThemedText>
+              <ThemedText style={styles.buttonText}>TUTORIALS</ThemedText>
             </TouchableOpacity>
           </Link>
           
@@ -51,11 +51,9 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </Link>
           
-          <Link href="/(tabs)/scan" asChild>
-            <TouchableOpacity style={styles.button}>
-              <ThemedText style={styles.buttonText}>SCAN</ThemedText>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity style={styles.button}>
+            <ThemedText style={styles.buttonText}>SCAN</ThemedText>
+          </TouchableOpacity>
           
           <Link href="/(tabs)/settings" asChild>
             <TouchableOpacity style={styles.button}>
@@ -77,6 +75,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    paddingBottom: 20,
   },
   header: {
     backgroundColor: '#00CED1',
@@ -84,24 +83,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBottomColor: '#000',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingTop: 45,
-    paddingBottom: 15,
-    height: 50,
-    minHeight: 50,
+    justifyContent: 'center',
+    height: 80,
+    minHeight: 80,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
   title: {
-    fontSize: 38,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontFamily: 'Koulen',
     color: '#000',
     textAlign: 'center',
     includeFontPadding: false,
     lineHeight: 45,
+    letterSpacing: 1,
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 40,
+    marginTop: '8%',
+    marginBottom: '5%',
     width: BUTTON_WIDTH,
   },
   logoWrapper: {
@@ -129,19 +129,29 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: 'center',
     width: BUTTON_WIDTH,
-    gap: 25,
+    gap: 15,
+    flex: 1,
+    paddingBottom: 20,
   },
   button: {
-    backgroundColor: 'rgba(0, 226, 230, 0.8)', // #00CED1 with 80% opacity
-    padding: 10,
+    backgroundColor: 'rgba(0, 226, 230, 0.8)',
+    height: 65,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 3,
     borderColor: '#000',
     width: '100%',
+    borderRadius: 0,
   },
   buttonText: {
     fontSize: 25,
+    fontFamily: 'Koulen',
     fontWeight: '900',
     color: '#000',
+    letterSpacing: 0,
+    lineHeight: 32,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    marginTop: 8,
   },
 });
