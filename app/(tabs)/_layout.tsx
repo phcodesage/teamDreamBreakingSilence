@@ -8,6 +8,7 @@ export default function TabLayout() {
       <Stack.Screen name="translate" />
       <Stack.Screen name="settings" />
       <Stack.Screen name="about" />
+      <Stack.Screen name="scan" />
     </Stack>
   );
 }

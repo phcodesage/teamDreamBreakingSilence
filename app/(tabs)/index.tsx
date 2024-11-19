@@ -51,9 +51,11 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </Link>
           
-          <TouchableOpacity style={styles.button}>
-            <ThemedText style={styles.buttonText}>SCAN</ThemedText>
-          </TouchableOpacity>
+          <Link href="/(tabs)/scan" asChild>
+            <TouchableOpacity style={styles.button}>
+              <ThemedText style={styles.buttonText}>SCAN</ThemedText>
+            </TouchableOpacity>
+          </Link>
           
           <Link href="/(tabs)/settings" asChild>
             <TouchableOpacity style={styles.button}>

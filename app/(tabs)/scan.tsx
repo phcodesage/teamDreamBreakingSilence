@@ -1,34 +1,49 @@
 import { StyleSheet, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
-import { useRouter } from 'expo-router';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { useState, useEffect } from 'react';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
-import { Camera, CameraType } from 'expo-camera';
-import { useState, useRef, useEffect } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import Animated, { 
+  useAnimatedStyle, 
+  withRepeat, 
+  withSequence, 
+  withTiming,
+  useSharedValue
+} from 'react-native-reanimated';
 
-const BUTTON_WIDTH = 170;
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const CAMERA_HEIGHT = 400;
+const RESULT_BOX_SIZE = SCREEN_WIDTH * 0.3;
+const TITLE_WIDTH = 35 * 4;
 
 export default function ScanScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [type, setType] = useState<'front' | 'back'>('back');
-  const cameraRef = useRef<Camera | null>(null);
-  const router = useRouter();
+  const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState<CameraType>('back');
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
+  const tooltipOpacity = useSharedValue(1);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
+    tooltipOpacity.value = withRepeat(
+      withSequence(
+        withTiming(0.4, { duration: 1000 }),
+        withTiming(1, { duration: 1000 })
+      ),
+      -1,
+      true
+    );
   }, []);
 
+  const tooltipStyle = useAnimatedStyle(() => ({
+    opacity: tooltipOpacity.value,
+  }));
+
   const toggleCameraType = () => {
-    setType(current => 
-      current === CameraType.back ? CameraType.front : CameraType.back
-    );
+    setFacing(current => current === 'back' ? 'front' : 'back');
   };
 
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <View style={styles.container}>
         <ThemedText>Requesting camera permission...</ThemedText>
@@ -36,10 +51,13 @@ export default function ScanScreen() {
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <ThemedText>No access to camera</ThemedText>
+        <ThemedText style={styles.text}>We need your permission to show the camera</ThemedText>
+        <TouchableOpacity style={styles.button} onPress={requestPermission}>
+          <ThemedText style={styles.buttonText}>GRANT PERMISSION</ThemedText>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -51,34 +69,72 @@ export default function ScanScreen() {
       resizeMode="cover"
     >
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
-        {/* Header */}
         <View style={styles.header}>
           <ThemedText style={styles.title}>SCAN</ThemedText>
         </View>
 
-        {/* Camera Container */}
-        <View style={styles.cameraContainer}>
-          <Camera
-            ref={cameraRef}
-            style={styles.camera}
-            type={type}
-          >
-            <View style={styles.detectionBox} />
-          </Camera>
-        </View>
+        <View style={styles.mainContent}>
+          <View style={styles.cameraContainer}>
+            {isCameraActive ? (
+              <View style={styles.activeCameraContainer}>
+                <CameraView
+                  style={styles.camera}
+                  facing={facing}
+                >
+                  <View style={styles.detectionBox} />
+                </CameraView>
+              </View>
+            ) : (
+              <TouchableOpacity 
+                style={styles.cameraPlaceholder}
+                onPress={() => {
+                  setIsCameraActive(true);
+                  setShowTooltip(false);
+                }}
+              >
+                <MaterialIcons 
+                  name="camera-alt" 
+                  size={80} 
+                  color="#00CED1" 
+                />
+                {showTooltip && (
+                  <Animated.View style={[styles.tooltip, tooltipStyle]}>
+                    <ThemedText style={styles.tooltipText}>
+                      Tap here to activate camera
+                    </ThemedText>
+                  </Animated.View>
+                )}
+              </TouchableOpacity>
+            )}
+            
+            <TouchableOpacity 
+              style={styles.flipButton}
+              onPress={toggleCameraType}
+            >
+              <MaterialIcons name="flip-camera-ios" size={30} color="#00CED1" />
+            </TouchableOpacity>
+          </View>
 
-        {/* Result Box */}
-        <View style={styles.resultBox}>
-          <ThemedText style={styles.resultText}>Open Sign</ThemedText>
-        </View>
+          <View style={styles.bottomContainer}>
+            <View style={styles.resultContainer}>
+              <View style={styles.resultBox}>
+                <ThemedText style={styles.resultText} adjustsFontSizeToFit numberOfLines={1}>
+                  A
+                </ThemedText>
+              </View>
+              <ThemedText style={styles.resultLabel}>Hand Sign Result</ThemedText>
+            </View>
 
-        {/* Back Button */}
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.push("/(tabs)")}
-        >
-          <ThemedText style={styles.buttonText}>BACK</ThemedText>
-        </TouchableOpacity>
+            <View style={styles.backButtonContainer}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => router.replace("/(tabs)")}
+              >
+                <ThemedText style={styles.buttonText}>BACK</ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       </SafeAreaView>
     </ImageBackground>
   );
@@ -92,7 +148,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
   },
   header: {
     backgroundColor: '#00CED1',
@@ -115,57 +170,91 @@ const styles = StyleSheet.create({
     lineHeight: 45,
     letterSpacing: 1,
   },
+  mainContent: {
+    flex: 1,
+    width: '100%',
+  },
   cameraContainer: {
-    width: SCREEN_WIDTH - 40,
-    height: CAMERA_HEIGHT,
-    marginTop: 20,
-    borderWidth: 3,
-    borderColor: '#000',
+    width: '100%',
+    height: '50%',
+    backgroundColor: '#000',
+    borderBottomWidth: 3,
+    borderBottomColor: '#000',
+    position: 'relative',
     overflow: 'hidden',
   },
   camera: {
     flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  cameraPlaceholder: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  placeholderImage: {
+    width: '50%',
+    height: '50%',
+  },
+  flipButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    padding: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 25,
   },
   detectionBox: {
-    width: 200,
-    height: 200,
+    width: '100%',
+    height: '100%',
     borderWidth: 2,
     borderColor: '#00CED1',
-    backgroundColor: 'transparent',
+    borderStyle: 'dashed',
+  },
+  bottomContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 20,
+  },
+  resultContainer: {
+    alignItems: 'center',
   },
   resultBox: {
+    width: RESULT_BOX_SIZE,
+    height: RESULT_BOX_SIZE,
     backgroundColor: 'rgba(0, 206, 209, 0.8)',
-    width: SCREEN_WIDTH - 40,
-    height: 65,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderWidth: 3,
     borderColor: '#000',
-    marginTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    padding: 5,
   },
   resultText: {
+    fontSize: 40,
+    fontFamily: 'Koulen',
+    color: '#000',
+  },
+  resultLabel: {
     fontSize: 25,
     fontFamily: 'Koulen',
-    fontWeight: '900',
     color: '#000',
-    letterSpacing: 0,
-    lineHeight: 32,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    marginTop: 8,
+  },
+  backButtonContainer: {
+    width: '100%',
+    alignItems: 'center',
   },
   backButton: {
-    backgroundColor: 'rgba(0, 206, 209, 0.8)',
-    height: 65,
+    backgroundColor: '#00CED1',
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
     borderColor: '#000',
-    width: BUTTON_WIDTH,
+    width: TITLE_WIDTH,
     borderRadius: 0,
-    marginTop: 20,
   },
   buttonText: {
     fontSize: 25,
@@ -177,5 +266,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     marginTop: 8,
+  },
+  text: {
+    fontSize: 18,
+    color: '#000',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: 'rgba(0, 206, 209, 0.8)',
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#000',
+    width: TITLE_WIDTH,
+    borderRadius: 0,
+  },
+  activeCameraContainer: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#000',
+  },
+  tooltip: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    padding: 10,
+    borderRadius: 5,
+    bottom: -40,
+  },
+  tooltipText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Koulen',
   },
 }); 
