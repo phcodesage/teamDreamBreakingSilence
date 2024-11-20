@@ -1,6 +1,6 @@
 import { StyleSheet, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
@@ -19,12 +19,24 @@ const TITLE_WIDTH = 35 * 4;
 
 export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [facing, setFacing] = useState<CameraType>('back');
+  const [type, setType] = useState<CameraType>('back');
+  const cameraRef = useRef<any>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
   const tooltipOpacity = useSharedValue(1);
 
   useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await requestPermission();
+        if (!permission?.granted) {
+          console.log("Camera permission not granted");
+        }
+      } catch (error) {
+        console.error("Error requesting permissions:", error);
+      }
+    })();
+
     tooltipOpacity.value = withRepeat(
       withSequence(
         withTiming(0.4, { duration: 1000 }),
@@ -40,7 +52,7 @@ export default function ScanScreen() {
   }));
 
   const toggleCameraType = () => {
-    setFacing(current => current === 'back' ? 'front' : 'back');
+    setType(current => current === 'back' ? 'front' : 'back');
   };
 
   if (!permission) {
@@ -56,7 +68,7 @@ export default function ScanScreen() {
       <View style={styles.container}>
         <ThemedText style={styles.text}>We need your permission to show the camera</ThemedText>
         <TouchableOpacity style={styles.button} onPress={requestPermission}>
-          <ThemedText style={styles.buttonText}>GRANT PERMISSION</ThemedText>
+          <ThemedText style={styles.buttonText}>Grant Permission</ThemedText>
         </TouchableOpacity>
       </View>
     );
@@ -78,11 +90,10 @@ export default function ScanScreen() {
             {isCameraActive ? (
               <View style={styles.activeCameraContainer}>
                 <CameraView
+                  ref={cameraRef}
                   style={styles.camera}
-                  facing={facing}
-                >
-                  <View style={styles.detectionBox} />
-                </CameraView>
+                  cameraType={type}
+                />
               </View>
             ) : (
               <TouchableOpacity 
@@ -128,7 +139,7 @@ export default function ScanScreen() {
             <View style={styles.backButtonContainer}>
               <TouchableOpacity 
                 style={styles.backButton}
-                onPress={() => router.replace("/(tabs)")}
+                onPress={() => router.push("/")}
               >
                 <ThemedText style={styles.buttonText}>BACK</ThemedText>
               </TouchableOpacity>
