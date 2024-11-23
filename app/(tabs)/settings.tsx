@@ -29,9 +29,11 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </Link>
             
-            <TouchableOpacity style={styles.button}>
-              <ThemedText style={styles.buttonText}>CONTACT US</ThemedText>
-            </TouchableOpacity>
+            <Link href="/contact" asChild>
+              <TouchableOpacity style={styles.button}>
+                <ThemedText style={styles.buttonText}>CONTACT US</ThemedText>
+              </TouchableOpacity>
+            </Link>
           </View>
           
           {/* Back Button */}

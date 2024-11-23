@@ -9,6 +9,7 @@ export default function TabLayout() {
       <Stack.Screen name="settings" />
       <Stack.Screen name="about" />
       <Stack.Screen name="scan" />
+      <Stack.Screen name="contact" />
     </Stack>
   );
 }

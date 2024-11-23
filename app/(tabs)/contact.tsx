@@ -1,7 +1,8 @@
-import { StyleSheet, View, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ImageBackground } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
+import { Image } from 'react-native';
 
 const BUTTON_WIDTH = 170;
 
