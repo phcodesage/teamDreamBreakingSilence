@@ -1,5 +1,5 @@
 import { StyleSheet, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
 
@@ -37,12 +37,13 @@ export default function TutorialScreen() {
           </View>
           
           {/* Back Button */}
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ThemedText style={styles.buttonText}>BACK</ThemedText>
-          </TouchableOpacity>
+          <View style={styles.backButtonContainer}>
+            <Link href="/" asChild>
+              <TouchableOpacity style={styles.backButton}>
+                <ThemedText style={styles.buttonText}>BACK</ThemedText>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
       </SafeAreaView>
     </ImageBackground>

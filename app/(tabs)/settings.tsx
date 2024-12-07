@@ -1,8 +1,7 @@
 import { StyleSheet, View, TouchableOpacity, ImageBackground } from 'react-native';
-import { router } from 'expo-router';
+import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
-import { Link } from 'expo-router';
 
 const BUTTON_WIDTH = 170;
 
@@ -37,12 +36,13 @@ export default function SettingsScreen() {
           </View>
           
           {/* Back Button */}
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ThemedText style={styles.buttonText}>BACK</ThemedText>
-          </TouchableOpacity>
+          <View style={styles.backButtonContainer}>
+            <Link href="/" asChild>
+              <TouchableOpacity style={styles.backButton}>
+                <ThemedText style={styles.buttonText}>BACK</ThemedText>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
       </SafeAreaView>
     </ImageBackground>

@@ -82,15 +82,14 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
     ndkVersion rootProject.ext.ndkVersion
-
-    buildToolsVersion "34.0.0"
-    compileSdk 34
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     namespace 'com.phcodesage.teamDream'
     defaultConfig {
         applicationId 'com.phcodesage.teamDream'
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion 34
+        minSdkVersion 24
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
     }
@@ -124,6 +123,22 @@ android {
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    dexOptions {
+        jumboMode = true
+        javaMaxHeapSize = "4g"
+        preDexLibraries = true
+        additionalParameters += '--minimal-main-dex'
+    }
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
@@ -144,6 +159,11 @@ android {
             android.packagingOptions[prop] += it
         }
     }
+}
+
+configurations.all {
+    exclude group: 'com.android.support', module: 'support-media-compat'
+    exclude group: 'com.android.support', module: 'support-compat'
 }
 
 dependencies {
